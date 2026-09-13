@@ -3,6 +3,10 @@ from typing import Tuple, Optional, Union, Dict, Any, List
 import torch
 from .kernel import compact_kv_cache_inplace
 from .tarski_state import TarskiStateCompactor
+from .saliency import PermSaliencyScorer
+from .young_compactor import YoungFactorizedCompactor
+from .compactor_2d import TwoDimensionalIdempotentCompactor
+from .hysteresis import HysteresisTokenStabilizer
 
 
 class ContextType(str, Enum):
@@ -109,6 +113,71 @@ class InplaceKVCompactor:
 
         target_map = self.build_idempotent_map(batch, heads, seq_len, active_indices, capacity, device)
         return self.compact(key_cache, value_cache, target_map, capacity)
+
+    def compact_with_perm_saliency(
+        self,
+        key_cache: torch.Tensor,
+        value_cache: torch.Tensor,
+        capacity: int,
+        protected_prefix_len: int = 4,
+        query_vector: Optional[torch.Tensor] = None
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        0-FLOPs Saliency Compaction:
+        Uses Birkhoff Permutation Rank Saliency to select active tokens without any
+        floating-point matrix multiplications, and compacts in-place.
+        """
+        scorer = PermSaliencyScorer(head_dim=key_cache.shape[-1])
+        active_indices = scorer.select_active_indices(
+            key_cache,
+            capacity=capacity,
+            protected_prefix_len=protected_prefix_len,
+            query_vector=query_vector
+        )
+        batch, heads, seq_len, _ = key_cache.shape
+        target_map = self.build_idempotent_map(batch, heads, seq_len, active_indices, capacity, key_cache.device)
+        return self.compact(key_cache, value_cache, target_map, capacity)
+
+    def compact_with_young_factorization(
+        self,
+        key_cache: torch.Tensor,
+        value_cache: torch.Tensor,
+        active_indices: torch.Tensor,
+        capacity: int,
+        tile_size: int = 128
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Young-Factorized Compaction:
+        Decomposes permutation into localized tiles, bounding worst-case cycle length.
+        """
+        young_compactor = YoungFactorizedCompactor(tile_size=tile_size, num_warps=self.num_warps)
+        batch, heads, seq_len, _ = key_cache.shape
+        target_map = young_compactor.build_factorized_target_map(
+            batch, heads, seq_len, active_indices, capacity, key_cache.device
+        )
+        return young_compactor.compact(key_cache, value_cache, target_map, capacity)
+
+    def compact_2d(
+        self,
+        key_cache: torch.Tensor,
+        value_cache: torch.Tensor,
+        target_map: torch.Tensor,
+        capacity: int,
+        subspace_dim: Optional[int] = None,
+        compress_channel: bool = False
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        2D Idempotent Compactor:
+        Combines temporal in-place compaction with channel invariant subspace projection.
+        """
+        compactor_2d = TwoDimensionalIdempotentCompactor(
+            head_dim=key_cache.shape[-1],
+            subspace_dim=subspace_dim,
+            num_warps=self.num_warps
+        ).to(key_cache.device)
+        return compactor_2d.compact_2d(
+            key_cache, value_cache, target_map, capacity, compress_channel=compress_channel
+        )
 
 
 class AutoContextEngine:
