@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.9.4)  10 SEP 2026 04:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.9.4)  13 SEP 2026 12:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -661,7 +661,7 @@ Underfull \hbox (badness 1902) in paragraph at lines 62--62
 []\OT1/lmr/bx/n/12 (+20) Idempotent State Pro-jec-tion and
  []
 
-<figures/FIG_2_Memory_State_Transition.pdf, id=115, 610.32013pt x 790.99513pt>
+<figures/FIG_2_Memory_State_Transition.pdf, id=123, 610.32013pt x 790.99513pt>
 File: figures/FIG_2_Memory_State_Transition.pdf Graphic file (type pdf)
 <use figures/FIG_2_Memory_State_Transition.pdf>
 Package pdftex.def Info: figures/FIG_2_Memory_State_Transition.pdf  used on inp
@@ -696,32 +696,34 @@ Underfull \hbox (badness 1701) in paragraph at lines 183--183
  []
 
 [3] [4]
-Underfull \hbox (badness 1237) in paragraph at lines 280--281
+Underfull \hbox (badness 1237) in paragraph at lines 318--319
 []\OT1/lmr/bx/n/10 (+20) In-Situ Per-mu-ta-tions: \OT1/lmr/m/n/10 (+20) The-o-r
 et-i-cal foun-da-tions
  []
 
-
-Underfull \hbox (badness 2781) in paragraph at lines 287--288
+[5]
+Underfull \hbox (badness 2781) in paragraph at lines 325--326
 \OT1/lmr/m/n/10 (+20) Anti-grav-ity / Gem-ini) for en-gi-neer-ing sup-port in
  []
 
-(main.bbl [5]) [6] [7 <./figures/FIG_2_Memory_State_Transition.pdf>] (main.aux)
+(main.bbl) [6] [7
+
+] [8 <./figures/FIG_2_Memory_State_Transition.pdf>] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 748328D91990F87F4103CDF2E90A675B;4573.
+(rerunfilecheck)             Checksum: BBEE04D5750E00778633156DB8985AB2;5268.
  ) 
 Here is how much of TeX's memory you used:
- 13692 strings out of 467871
- 216326 string characters out of 5415957
- 679184 words of memory out of 5000000
- 42086 multiletter control sequences out of 15000+600000
- 696422 words of font info for 194 fonts, out of 8000000 for 9000
+ 13761 strings out of 467871
+ 217228 string characters out of 5415957
+ 679375 words of memory out of 5000000
+ 42110 multiletter control sequences out of 15000+600000
+ 714114 words of font info for 217 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,1717b,577s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,1717b,596s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx
 10.pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
 /lmbx12.pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -731,20 +733,22 @@ type1/public/lm/lmmi5.pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fo
 nts/type1/public/lm/lmmi7.pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTe
 X/fonts/type1/public/lm/lmr10.pfb><C:/Users/emre.cetin/AppData/Local/Programs/M
 iKTeX/fonts/type1/public/lm/lmr12.pfb><C:/Users/emre.cetin/AppData/Local/Progra
-ms/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Users/emre.cetin/AppData/Local/Pro
-grams/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/emre.cetin/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/emre.cetin/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/emre.cetin/AppDat
-a/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12.pfb><C:/Users/emre.cetin/A
-ppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/emre.ce
-tin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy7.pfb><C:/Users/emr
-e.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:/User
-s/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:
-/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/sym
-bols/msbm10.pfb>
-Output written on main.pdf (7 pages, 444394 bytes).
+ms/MiKTeX/fonts/type1/public/lm/lmr5.pfb><C:/Users/emre.cetin/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:/Users/emre.cetin/AppData/Local/
+Programs/MiKTeX/fonts/type1/public/lm/lmr7.pfb><C:/Users/emre.cetin/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/lm/lmr8.pfb><C:/Users/emre.cetin/AppData/
+Local/Programs/MiKTeX/fonts/type1/public/lm/lmri10.pfb><C:/Users/emre.cetin/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri12.pfb><C:/Users/emre.ceti
+n/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmri7.pfb><C:/Users/emre.
+cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy10.pfb><C:/Users/
+emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy7.pfb><C:/Us
+ers/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><
+C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.
+pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
+nts/symbols/msbm10.pfb>
+Output written on main.pdf (8 pages, 493038 bytes).
 PDF statistics:
- 482 PDF objects out of 1000 (max. 8388607)
- 73 named destinations out of 1000 (max. 500000)
- 42142 words of extra memory for PDF output out of 42996 (max. 10000000)
+ 513 PDF objects out of 1000 (max. 8388607)
+ 83 named destinations out of 1000 (max. 500000)
+ 50350 words of extra memory for PDF output out of 51595 (max. 10000000)
 

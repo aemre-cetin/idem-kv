@@ -98,6 +98,23 @@ else:
 print(f'Başarılı icra: {type(res)}')
 ```
 
+### 3.3. Chebyshev Spektral & Hibrit Permütasyon KV Skorlayıcıları
+```python
+import torch
+from idempotent_kv.saliency import ChebyshevSpectralSaliencyScorer, HybridPermSpectralScorer
+
+# 1. Ortogonal Chebyshev Spektral Harmonik Enerjisi:
+# Yüksek frekanslı akıl yürütme (reasoning) tokenlarını tespit eder ve korur
+spectral_scorer = ChebyshevSpectralSaliencyScorer(degree=3)
+key_cache = torch.randn(2, 4, 128, 64)
+spectral_scores = spectral_scorer.score_spectral_energy(key_cache)
+
+# 2. Hibrit Perm-Spectral Skorlayıcı (0-FLOPs Rank + Chebyshev Enerji):
+hybrid_scorer = HybridPermSpectralScorer(head_dim=64, degree=3, alpha=0.5)
+active_idx = hybrid_scorer.select_active_indices(key_cache, capacity=32, protected_prefix_len=4)
+print(f"Aktif Tutulan Token İndeksleri: {active_idx.shape}") # (2, 4, 32)
+```
+
 ---
 
 ## Lisans ve Telif Hakkı

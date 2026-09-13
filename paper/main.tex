@@ -57,7 +57,7 @@ Let an autoregressive attention layer maintain key and value cache tensors denot
 \begin{equation}
     \text{Addr}(\mathbf{K}[b, h, i, d]) = \text{Base} + b \cdot s_{b} + h \cdot s_{h} + i \cdot s_{n} + d \cdot s_{d}
 \end{equation}
-During eviction, an attention scoring engine assigns a utility metric $S(i) \in \mathbb{R}$ to each token position $i \in \{0, 1, \dots, N-1\}$. The objective is to retain the top-$K$ tokens ($K < N$) packed contiguously in indices $0, \dots, K-1$, while routing the evicted $N-K$ tokens to indices $K, \dots, N-1$.
+During eviction, an attention scoring engine assigns a utility metric $S(i) \in [0, 1]$ to each token position $i \in \{0, 1, \dots, N-1\}$. Rather than evaluating floating-point matrix multiplications ($O(N \cdot D)$ FLOPs), our architecture computes token saliency via the Birkhoff-von Neumann rank permutation framework: each key vector is mapped to its intrinsic rank permutation $\Phi(\mathbf{K}[b, h, i, :]) \in S_D$. Token importance is evaluated via the integer Spearman Footrule distance with strictly \textbf{0 floating-point multiplications} and absolute scale invariance. Furthermore, to prevent marginal tokens from flickering across decision boundaries (cache thrashing), a Schmitt-trigger dual-threshold hysteresis filter ($\tau_{\text{evict}} < \tau_{\text{retain}}$) locks candidate tokens into stable retention attractor basins. The objective is to retain the top-$K$ tokens ($K < N$) packed contiguously in indices $0, \dots, K-1$, while routing the evicted $N-K$ tokens to indices $K, \dots, N-1$.
 
 \subsection{Idempotent State Projection and Fixed-Point Routing}
 To ensure stability across multi-step generation cycles without token oscillation or thrashing, we formalize KV-cache compaction through the algebraic framework of idempotent projection operators~\cite{cetin2013idempotent}.
@@ -186,6 +186,44 @@ Following the completion of the cycle shifts, indices $0, \dots, K-1$ contain ex
     \text{Active\_Limit} = \text{Base} + K \cdot s_n
 \end{equation}
 Downstream attention operations (e.g., FlashAttention-2~\cite{dao2023flashattention2}) stream directly over the first $K$ contiguous elements with standard unit-stride tensor memory accesses, completely avoiding paged lookup tables.
+
+\subsection{Young Subgroup Factorization for Bounded Cycle Latency}
+\label{sec:young}
+To eliminate the worst-case serial pointer chasing over global memory ($20.82\text{ ms}$ on $N = 8,192$), we introduce an algebraic partition over the permutation space via \textit{Young subgroups}~\cite{cetin2013idempotent}:
+\begin{theorem}[Young Subgroup Bounded Cycle Invariant]
+Let the sequence index space be partitioned into $M = \lceil N/C \rceil$ discrete tiles of uniform capacity $C$ ($C \ll N$). The permutation group is factorized into a direct product of localized Young subgroups:
+\begin{equation}
+    \mathcal{Y} = S_{\lambda_1} \times S_{\lambda_2} \times \dots \times S_{\lambda_M} \le S_N, \quad \sum_{m=1}^M \lambda_m = N
+\end{equation}
+Under Young subgroup factorization, any cyclic orbit $\mathcal{C}_k$ under permutation $\pi \in \mathcal{Y}$ has its length strictly bounded by tile capacity:
+\begin{equation}
+    \max_k L_k \le C \ll N
+\end{equation}
+\end{theorem}
+\begin{proof}
+By construction, each cyclic orbit $\mathcal{C}_k$ is entirely contained within an individual Young subgroup factor $S_{\lambda_m}$. Because each subgroup acts on at most $C$ elements ($\lambda_m \le C$), no cycle can exceed length $C$. Consequently, the entire working buffer of a tile ($C \times D \times 2\text{ bytes} \le 32\text{ KB}$ for $C = 128$) fits inside the Streaming Multiprocessor's high-speed Shared Memory (SRAM), bounding cycle traversal to sub-millisecond latencies.
+\end{proof}
+
+\subsection{Two-Dimensional Idempotent Compaction \texorpdfstring{(Time $\times$ Channel)}{(Time x Channel)}}
+\label{sec:2d_compaction}
+While temporal in-place compaction reduces sequence memory ($N \to K$), the head dimension $D$ remains uncompressed. We extend the architecture into a unified \textbf{2D Idempotent Compactor} by coupling temporal permutation with a spectral channel projector:
+\begin{definition}[Invariant Channel Projector]
+Let $\mathbf{U} \in \mathbb{R}^{D \times d_{\text{sub}}}$ be an orthonormal basis ($\mathbf{U}^T \mathbf{U} = \mathbf{I}_{d_{\text{sub}}}$). The channel projection operator:
+\begin{equation}
+    \boldsymbol{\Pi}_{\text{retain}} = \mathbf{U} \mathbf{U}^T \in \mathbb{R}^{D \times D}
+\end{equation}
+is an orthogonal projection satisfying $\boldsymbol{\Pi}_{\text{retain}}^2 = \boldsymbol{\Pi}_{\text{retain}}$ and $\boldsymbol{\Pi}_{\text{retain}} = \boldsymbol{\Pi}_{\text{retain}}^T$.
+\end{definition}
+We construct the complementary eviction projector:
+\begin{equation}
+    \boldsymbol{\Pi}_{\text{evict}} = \mathbf{I}_D - \boldsymbol{\Pi}_{\text{retain}} \implies \boldsymbol{\Pi}_{\text{retain}} \boldsymbol{\Pi}_{\text{evict}} \equiv \mathbf{0}
+\end{equation}
+By projecting retained vectors onto $\boldsymbol{\Pi}_{\text{retain}}$, attention energy from evicted dimensions is mathematically nullified ($0.00e+00$ attention leakage). For sequence retention ratio $r_t = 0.5$ ($N \to N/2$) and channel dimension ratio $r_c = 0.5$ ($D \to D/2$), the joint 2D compaction achieves:
+\begin{equation}
+    \text{VRAM Reduction} = 1.0 - (r_t \cdot r_c) = 75.0\%
+\end{equation}
+all operating strictly within existing allocation bounds with zero auxiliary VRAM.
+
 
 \section{Implementation on GPU Accelerators}
 \label{sec:impl}
