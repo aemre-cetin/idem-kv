@@ -20,7 +20,6 @@
 
 \author{
     \textbf{Dr. A. Emre \c{C}ET\.{I}N}\\
-    \textit{Computational Systems and Cognitive Architectures, Izmir, Turkey}\\
     \texttt{aemre.cetin@gmail.com}
 }
 \date{\today}
@@ -57,29 +56,22 @@ Let an autoregressive attention layer maintain key and value cache tensors denot
 \begin{equation}
     \text{Addr}(\mathbf{K}[b, h, i, d]) = \text{Base} + b \cdot s_{b} + h \cdot s_{h} + i \cdot s_{n} + d \cdot s_{d}
 \end{equation}
-During eviction, an attention scoring engine assigns a utility metric $S(i) \in [0, 1]$ to each token position $i \in \{0, 1, \dots, N-1\}$. Rather than evaluating floating-point matrix multiplications ($O(N \cdot D)$ FLOPs), our architecture computes token saliency via the Birkhoff-von Neumann rank permutation framework: each key vector is mapped to its intrinsic rank permutation $\Phi(\mathbf{K}[b, h, i, :]) \in S_D$. Token importance is evaluated via the integer Spearman Footrule distance with strictly \textbf{0 floating-point multiplications} and absolute scale invariance. Furthermore, to prevent marginal tokens from flickering across decision boundaries (cache thrashing), a Schmitt-trigger dual-threshold hysteresis filter ($\tau_{\text{evict}} < \tau_{\text{retain}}$) locks candidate tokens into stable retention attractor basins. The objective is to retain the top-$K$ tokens ($K < N$) packed contiguously in indices $0, \dots, K-1$, while routing the evicted $N-K$ tokens to indices $K, \dots, N-1$.
+During eviction, an attention scoring engine assigns a utility metric $S(i) \in \mathbb{R}$ to each token position $i \in \{0, 1, \dots, N-1\}$. The objective is to retain the top-$K$ tokens ($K < N$) packed contiguously in indices $0, \dots, K-1$, while routing the evicted $N-K$ tokens to indices $K, \dots, N-1$.
 
-\subsection{Idempotent State Projection and Fixed-Point Routing}
-To ensure stability across multi-step generation cycles without token oscillation or thrashing, we formalize KV-cache compaction through the algebraic framework of idempotent projection operators~\cite{cetin2013idempotent}.
-
-Let $\mathcal{M}$ denote the configuration space of KV cache memory states. An eviction compaction operator $\mathcal{P}: \mathcal{M} \to \mathcal{M}$ maps a fragmented buffer state $\mathbf{M}$ (in which active retained tokens are non-contiguously dispersed) into a canonical compacted state $\mathcal{P}(\mathbf{M})$ where all $K$ active tokens occupy the contiguous prefix partition $[0, K-1]$.
-\begin{definition}[Idempotent Compaction Operator]
-The compaction operator $\mathcal{P}$ is an idempotent projection over the tensor memory configuration space:
-\begin{equation}
-    \mathcal{P}(\mathcal{P}(\mathbf{M})) = \mathcal{P}(\mathbf{M}), \quad \forall \mathbf{M} \in \mathcal{M}
-    \label{eq:idempotent_operator}
-\end{equation}
-\end{definition}
-At the index coordinate level, the destination routing function $f: \{0, \dots, N-1\} \to \{0, \dots, N-1\}$ assigns each token index $x$ to its target designated slot in the active prefix. Retained tokens already residing in their target positions are mathematical \textit{fixed points}:
-\begin{equation}
-    \mathcal{F} = \{x \in \{0, \dots, N-1\} \mid f(x) = x\}
-\end{equation}
-For any token $x$, once routed to its target destination $f(x) \in \mathcal{F}$, subsequent application of the routing map leaves it invariant:
+\subsection{Idempotent Permutation Mapping}
+To ensure stability across multi-step generation cycles without token oscillation, we formalize the target destination map through the algebraic framework of idempotent permutations~\cite{cetin2013idempotent}:
+\begin{definition}[Idempotent Projection Map]
+A mapping function $f: \{0, \dots, N-1\} \to \{0, \dots, N-1\}$ is an idempotent projection over the index space if and only if:
 \begin{equation}
     f(f(x)) = f(x), \quad \forall x \in \{0, \dots, N-1\}
     \label{eq:idempotence}
 \end{equation}
-As illustrated in Figure~\ref{fig:state}, elements within $\mathcal{F}$ represent stabilized attractor basins that undergo strictly zero data movement in subsequent compaction epochs, ensuring single-pass convergence and preventing thrashing.
+\end{definition}
+Under Eq.~(\ref{eq:idempotence}), all elements mapped to their final designated positions become mathematical \textit{fixed points}:
+\begin{equation}
+    \mathcal{F} = \{x \mid f(x) = x\}
+\end{equation}
+As illustrated in Figure~\ref{fig:state}, elements within $\mathcal{F}$ represent stabilized attractor basins that do not undergo relocation in subsequent compaction epochs, ensuring single-pass convergence and preventing thrashing.
 
 \begin{figure*}[t]
 \centering
@@ -88,9 +80,7 @@ As illustrated in Figure~\ref{fig:state}, elements within $\mathcal{F}$ represen
 \label{fig:state}
 \end{figure*}
 
-\subsection{Physical Permutation Realization: Involutions and Cyclic Orbits}
-While the logical state compaction operator $\mathcal{P}$ is idempotent ($\mathcal{P}^2 = \mathcal{P}$), a permutation $\pi \in S_N$ in abstract group theory cannot be idempotent unless it is the identity ($\pi^2 = \pi \implies \pi = \text{id}$). To physically rearrange tensor payloads in-place without allocating auxiliary buffer memory, the data movement is realized as a permutation $\pi$ over physical slot indices.
-
+\subsection{Disjoint Cycle Decomposition}
 Any permutation $\pi$ of the finite set $\{0, \dots, N-1\}$ admits a unique decomposition into a set of mutually disjoint cyclic orbits:
 \begin{equation}
     \pi = \mathcal{C}_1 \circ \mathcal{C}_2 \circ \dots \circ \mathcal{C}_m
@@ -99,13 +89,7 @@ where each cyclic orbit is expressed as:
 \begin{equation}
     \mathcal{C}_k = (c_{k,0} \to c_{k,1} \to \dots \to c_{k,L_k-1} \to c_{k,0})
 \end{equation}
-with length $L_k \ge 1$ and $\mathcal{C}_j \cap \mathcal{C}_k = \emptyset$ for $j \ne k$. Fixed points $x \in \mathcal{F}$ correspond to trivial cycles of length $L_k = 1$ requiring zero data movement.
-
-Crucially, when $M$ evicted prefix slots $E = \{e_1, \dots, e_M\} \subset [0, K-1]$ are paired directly with $M$ retained tail tokens $R = \{r_1, \dots, r_M\} \subset [K, N-1]$, the physical movement is an \textbf{involution permutation} ($\pi^2 = \text{id}$, or $\pi = \pi^{-1}$), decomposing into $M$ independent transpositions (2-cycles):
-\begin{equation}
-    \pi = \prod_{j=1}^M (e_j \;\; r_j)
-\end{equation}
-Applying an involution swap twice restores initial memory coordinates ($\pi^2 = \text{id}$), whereas the memory state projection remains strictly idempotent ($\mathcal{P}^2 = \mathcal{P}$).
+with length $L_k \ge 1$ and $\mathcal{C}_j \cap \mathcal{C}_k = \emptyset$ for $j \ne k$. Trivial cycles of length $L_k = 1$ mirror precisely the fixed points $\mathcal{F}$ and require no data movement.
 
 \section{The In-Place Compaction Algorithm}
 \label{sec:algorithm}
@@ -187,44 +171,6 @@ Following the completion of the cycle shifts, indices $0, \dots, K-1$ contain ex
 \end{equation}
 Downstream attention operations (e.g., FlashAttention-2~\cite{dao2023flashattention2}) stream directly over the first $K$ contiguous elements with standard unit-stride tensor memory accesses, completely avoiding paged lookup tables.
 
-\subsection{Young Subgroup Factorization for Bounded Cycle Latency}
-\label{sec:young}
-To eliminate the worst-case serial pointer chasing over global memory ($20.82\text{ ms}$ on $N = 8,192$), we introduce an algebraic partition over the permutation space via \textit{Young subgroups}~\cite{cetin2013idempotent}:
-\begin{theorem}[Young Subgroup Bounded Cycle Invariant]
-Let the sequence index space be partitioned into $M = \lceil N/C \rceil$ discrete tiles of uniform capacity $C$ ($C \ll N$). The permutation group is factorized into a direct product of localized Young subgroups:
-\begin{equation}
-    \mathcal{Y} = S_{\lambda_1} \times S_{\lambda_2} \times \dots \times S_{\lambda_M} \le S_N, \quad \sum_{m=1}^M \lambda_m = N
-\end{equation}
-Under Young subgroup factorization, any cyclic orbit $\mathcal{C}_k$ under permutation $\pi \in \mathcal{Y}$ has its length strictly bounded by tile capacity:
-\begin{equation}
-    \max_k L_k \le C \ll N
-\end{equation}
-\end{theorem}
-\begin{proof}
-By construction, each cyclic orbit $\mathcal{C}_k$ is entirely contained within an individual Young subgroup factor $S_{\lambda_m}$. Because each subgroup acts on at most $C$ elements ($\lambda_m \le C$), no cycle can exceed length $C$. Consequently, the entire working buffer of a tile ($C \times D \times 2\text{ bytes} \le 32\text{ KB}$ for $C = 128$) fits inside the Streaming Multiprocessor's high-speed Shared Memory (SRAM), bounding cycle traversal to sub-millisecond latencies.
-\end{proof}
-
-\subsection{Two-Dimensional Idempotent Compaction \texorpdfstring{(Time $\times$ Channel)}{(Time x Channel)}}
-\label{sec:2d_compaction}
-While temporal in-place compaction reduces sequence memory ($N \to K$), the head dimension $D$ remains uncompressed. We extend the architecture into a unified \textbf{2D Idempotent Compactor} by coupling temporal permutation with a spectral channel projector:
-\begin{definition}[Invariant Channel Projector]
-Let $\mathbf{U} \in \mathbb{R}^{D \times d_{\text{sub}}}$ be an orthonormal basis ($\mathbf{U}^T \mathbf{U} = \mathbf{I}_{d_{\text{sub}}}$). The channel projection operator:
-\begin{equation}
-    \boldsymbol{\Pi}_{\text{retain}} = \mathbf{U} \mathbf{U}^T \in \mathbb{R}^{D \times D}
-\end{equation}
-is an orthogonal projection satisfying $\boldsymbol{\Pi}_{\text{retain}}^2 = \boldsymbol{\Pi}_{\text{retain}}$ and $\boldsymbol{\Pi}_{\text{retain}} = \boldsymbol{\Pi}_{\text{retain}}^T$.
-\end{definition}
-We construct the complementary eviction projector:
-\begin{equation}
-    \boldsymbol{\Pi}_{\text{evict}} = \mathbf{I}_D - \boldsymbol{\Pi}_{\text{retain}} \implies \boldsymbol{\Pi}_{\text{retain}} \boldsymbol{\Pi}_{\text{evict}} \equiv \mathbf{0}
-\end{equation}
-By projecting retained vectors onto $\boldsymbol{\Pi}_{\text{retain}}$, attention energy from evicted dimensions is mathematically nullified ($0.00e+00$ attention leakage). For sequence retention ratio $r_t = 0.5$ ($N \to N/2$) and channel dimension ratio $r_c = 0.5$ ($D \to D/2$), the joint 2D compaction achieves:
-\begin{equation}
-    \text{VRAM Reduction} = 1.0 - (r_t \cdot r_c) = 75.0\%
-\end{equation}
-all operating strictly within existing allocation bounds with zero auxiliary VRAM.
-
-
 \section{Implementation on GPU Accelerators}
 \label{sec:impl}
 
@@ -283,24 +229,8 @@ As detailed in Table~\ref{tab:results}, the conventional baseline demands an ins
 
 In contrast, both versions of our idempotent in-place permutation method accomplish complete compaction with strictly \textbf{0.00~MB} of auxiliary memory allocation. This provides empirical validation of the $O(1)$ auxiliary storage bound.
 
-\subsection{Latency Analysis and Cycle Dynamics in Production LLM Serving}
-\label{sec:latency_eval}
-As reported in Table~\ref{tab:results}, under realistic LLM KV-cache compaction, our optimized V2 kernel achieves an execution latency of \textbf{7.79~ms}, outperforming the native PyTorch out-of-place gather baseline (\textbf{8.08~ms}) while completely eliminating the 384.00~MB allocation spike. Under the synthetic worst-case permutation, V2 reduces execution latency from 60.03~ms to 20.82~ms (a 2.88$\times$ speedup over V1) via fast-path transposition shortcuts and vector coalescing.
-
-\paragraph{Topology of KV Pruning in Production Serving:}
-A critical architectural question is whether production LLM serving workloads ever encounter the high-latency worst-case regime ($20.82\text{ ms}$), or whether the realistic fast-path ($7.79\text{ ms}$) is guaranteed. In modern autoregressive KV eviction frameworks (e.g., StreamingLLM~\cite{xiao2023efficient}, $\text{H}_2\text{O}$~\cite{zhang2023h2o}, Scissorhands~\cite{liu2023scissorhands}), the sequence tensor exhibits a canonical three-zone topology:
-\begin{enumerate}
-    \item \textbf{Attention Sinks (Prefix Anchors):} Empirical studies demonstrate that initial prompt tokens (typically the first $S = 4\text{--}32$ tokens) capture disproportionately high attention scores across all generation steps~\cite{xiao2023efficient}. These tokens are permanently pinned in the cache. Under our associative map, $f(i) = i$ for all $i < S$, constituting pure 1-cycles (fixed points $\mathcal{F}$) that require strictly zero memory transactions.
-    \item \textbf{Bipartite Transposition Pairing ($L_k = 2$):} In the active working prefix $[0, K-1]$, pruning heuristics identify a set $E = \{e_1, \dots, e_M\}$ of low-utility tokens to be evicted ($M \le K - S$). Simultaneously, exactly $M$ high-utility tokens residing in the tail buffer $R = \{r_1, \dots, r_M\} \subset [K, N-1]$ must be preserved. Our associative router pairs each evicted slot $e_j \in E$ with a retained tail token $r_j \in R$. Because $E \cap R = \emptyset$, this bijection produces exclusively 2-cycles (transpositions) $\mathcal{C}_j = (e_j \;\; r_j)$. All retained tokens already residing in the prefix remain fixed points.
-    \item \textbf{Absence of Long Cycles ($L_k > 2$):} Because evicted prefix slots are directly populated by tail tokens rather than undergoing cascading cyclical shifts, the cyclic orbit lengths under all standard KV pruning policies are strictly bounded by:
-    \begin{equation}
-        L_k \in \{1, 2\}, \quad \forall k
-    \end{equation}
-    Permutation cycles of length $L_k \ge 3$ never manifest in autoregressive inference.
-\end{enumerate}
-
-\paragraph{Worst-Case as Adversarial Stress Test:}
-The worst-case benchmark in Table~\ref{tab:results} ($20.82\text{ ms}$) was intentionally engineered as an adversarial theoretical stress test: it evaluates an arbitrary random derangement of length $N = 8,192$ containing a single contiguous cycle ($L \approx 8,192$). Even under this pathological upper bound that exceeds any real LLM workload, the V2 kernel completes in 20.82~ms with zero memory allocation spikes. In real-world inference deployments, our kernel operates exclusively along the 7.79~ms fast path, delivering sub-PyTorch latency and strict $O(1)$ memory safety.
+\subsection{Latency and Ablation Analysis}
+Under realistic LLM KV-cache compaction (where evicted tokens are paired with retained tail tokens into 2-cycles and fixed points), our optimized V2 kernel achieves an execution latency of \textbf{7.79~ms}, outperforming the native PyTorch out-of-place gather baseline (\textbf{8.08~ms}) while completely eliminating memory allocation spikes. In the worst-case scenario with arbitrary long-cycle permutations, V2 reduces execution time from 60.03~ms to 20.82~ms, demonstrating a 2.88$\times$ speedup achieved through transposition fast paths and vectorized memory coalescing.
 
 \subsection{Numerical Correctness and Stability}
 Data integrity was validated by asserting strict tensor equivalence against reference out-of-place permutations across 20 consecutive evaluation epochs. Across all batches and attention heads:
