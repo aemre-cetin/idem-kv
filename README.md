@@ -4,11 +4,9 @@
 
 [![USPTO Patent Pending](https://img.shields.io/badge/USPTO_Patent-64%2F148,668_Pending-blue.svg)](https://patents.google.com)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Academic Paper](https://img.shields.io/badge/Academic_Paper-PDF-red.svg)](paper/main.pdf)
 [![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-brightgreen.svg)]()
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20Windows%20%7C%20Embedded%20RTOS-orange.svg)]()
-[![User Guide](https://img.shields.io/badge/Documentation-GUIDE.md-blue.svg)](./GUIDE.md)
-[![Idempotents Catalog](https://img.shields.io/badge/Mathematics-IDEMPOTENTS.md-green.svg)](./IDEMPOTENTS.md)
-[![Commercial Use Cases](https://img.shields.io/badge/Business_Strategy-USECASES.md-orange.svg)](./USECASES.md)
 
 ---
 
@@ -22,11 +20,10 @@
 
 ---
 
-### 🗂️ Temel Dokümantasyon Bağlantıları
+### 🗂️ Temel Kaynaklar ve Belgeler
 
-- 📘 **[`GUIDE.md`](./GUIDE.md):** Kütüphanenin tüm sınıfları, fonksiyonları ve mimarisi için tam çalışır, kopyala-yapıştır kod örnekleri içeren **kapsamlı kullanıcı ve geliştirici kılavuzu**.
-- 📐 **[`IDEMPOTENTS.md`](./IDEMPOTENTS.md):** Hilbert uzayı izdüşüm teoremleri, $\boldsymbol{\Pi}^2 = \boldsymbol{\Pi}$ cebirsel ispatları ve kütüphanenin **matematiksel manifold kataloğu**.
-- 💼 **[`USECASES.md`](./USECASES.md):** Ticarileşme potansiyeli en yüksekten başlayarak sıralı sektörel kullanım senaryoları, **TAM / SAM / SOM pazar büyüklükleri**, rakip analiz matrisi ve gelir stratejisi.
+- 📄 **[Akademik Makale (Tam Metin PDF)](paper/main.pdf):** Kütüphanenin teorik temelleri, $O(1)$ skalar bellek ispatları ve donanım benchmarkları.
+- 🚀 **[Hugging Face Vitrini](https://huggingface.co/spaces/aecetin/idempotent-ai-showcase):** Canlı web arayüzü ve interaktif çıkarım demosu.
 
 ---
 
