@@ -104,3 +104,6 @@ trash/
 **/trash/
 patent/
 **/patent/
+
+# Internal developer and personal notes
+internal/

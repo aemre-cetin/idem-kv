@@ -113,7 +113,6 @@ print(f"Aktif Tutulan Token İndeksleri: {active_idx.shape}") # (2, 4, 32)
 ```
 
 ---
----
 
 ## 📄 Akademik Makale ve Bilimsel Doğrulama / Academic Paper
 
@@ -143,34 +142,6 @@ Bu kütüphanede uygulanan cebirsel operatörler, in-situ döngü lideri ayrış
 3. A. E. Cetin, *"Generalized Idempotency and Involutive Transforms,"* arXiv:1209.0572 [math.OC], 2012.
 
 ---
----
-
-## 📄 Akademik Makale ve Bilimsel Doğrulama / Academic Paper
-
-Bu kütüphanenin dayandığı teorik temeller, matematiksel ispatlar ($f(f(x)) = f(x)$, $O(1)$ skalar bellek, sıfır-kopya döngü ayrışımı) ve donanımsal benchmark sonuçları resmi makalede ayrıntılı olarak sunulmuştur:
-
-- **Makale Başlığı:** **Zero-Copy In-Place Compaction and Idempotent Associative Routing of Dynamic Key-Value Cache Tensors in Deep Learning Accelerators**
-- **Tam Metin PDF:** [📄 Read Academic Paper (PDF)](paper/main.pdf)
-- **Yayın & İndeks Durumu:** ResearchGate 414015222 / arXiv: 01_idempotent_kv_cache.tar.gz (7 Sayfa Tam Makale, Yayında)
-
----
-
-## 🏛️ Resmi USPTO Patent Koruması / Intellectual Property
-
-Bu kütüphanede uygulanan cebirsel operatörler, in-situ döngü lideri ayrıştırma algoritmaları, sıfır-ek-bellekli tensör konsolidasyonu ve donanım IP mimarileri **United States Patent and Trademark Office (USPTO)** nezdinde resmi patent başvuruları ile uluslararası koruma altındadır:
-
-- **En Son Birleşik Başvuru:** U.S. Patent Application No. **`64/155,579`** (Confirmation No. **`5335`**, Dosyalama: 15 Eylül 2026)  
-- **Öncelik Hakları Zinciri (35 U.S.C. § 119(e)):**
-  - U.S. Provisional Application No. **`64/148,668`** (Confirmation No. `5890`, Dosyalama: 4 Eylül 2026, *Omnibus Master Permutation Engine*)
-  - U.S. Provisional Application No. **`64/152,256`** (Confirmation No. `4952`, Dosyalama: 11 Eylül 2026, *Hardware In-Situ Permutation Networks*)
-  - U.S. Provisional Application No. **`64/148,679`** (Confirmation No. `4824`, Dosyalama: 4 Eylül 2026, *Zero-Copy In-Place Compaction and Idempotent Associative Routing of Dynamic Key-Value Cache Tensors in Deep Learning Accelerators*)
-- **Buluş Sahibi / Mucit:** Dr. A. Emre ÇETİN (`aemre.cetin@gmail.com`)  
-- **Kurum:** Computational Systems and Cognitive Architectures, Izmir, Turkey
-
-### Kurucu Matematiksel Referanslar (Foundational Citations 2012–2013)
-1. A. E. Cetin, *"Idempotent Permutation Operators in Convex Optimization and Signal Analysis,"* arXiv:1301.2046 [math.CA], 2013.
-2. A. E. Cetin, *"Algebraic Cycles, Invariance, and Projections onto Convex Sets,"* arXiv:1307.3877 [math.FA], 2013.
-3. A. E. Cetin, *"Generalized Idempotency and Involutive Transforms,"* arXiv:1209.0572 [math.OC], 2012.
 
 ---
 
