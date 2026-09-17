@@ -29,7 +29,7 @@
 \maketitle
 
 \begin{abstract}
-The serving of autoregressive Large Language Models (LLMs) is severely constrained by the computational and memory capacity limits of the Key-Value (KV) cache, commonly referred to as the \textit{Memory Wall}. While dynamic context pruning algorithms mitigate memory expansion by discarding tokens of low attention mass, conventional systems incur severe hardware overheads: they either require out-of-place memory allocation spikes ($O(N)$ auxiliary buffers via operating system calls like \texttt{cudaMalloc}) or introduce high page-table indirection latencies via virtualized paged attention mechanisms. In this paper, we propose a novel hardware-software co-designed architecture and GPU execution kernel for \textbf{zero-copy in-place KV-cache compaction}. By formulating eviction as an algebraic mapping satisfying the idempotence condition ($f(f(x)) = f(x)$), our method stabilizes retained tokens into mathematical fixed points and partitions the permutation space into mutually disjoint permutation cycles. We prove that minimal-index cycle leaders can be deterministically verified on-the-fly with strictly $O(1)$ scalar auxiliary memory, completely eliminating marking bitmasks and temporary global buffers. We implement our algorithm as a high-performance Triton kernel and evaluate it on an enterprise NVIDIA Blackwell GPU accelerator (\texttt{sm\_120}) with a sequence length of 8,192 tokens and 50\% context pruning. Empirical results demonstrate a \textbf{100\% elimination of peak auxiliary VRAM} (dropping from 384.00~MB to exactly 0.00~MB), zero numerical degradation, and guaranteed physical memory contiguity for downstream tensor cores.
+The serving of autoregressive Large Language Models (LLMs) is severely constrained by the computational and memory capacity limits of the Key-Value (KV) cache, commonly referred to as the \textit{Memory Wall}. While dynamic context pruning algorithms mitigate memory expansion by discarding tokens of low attention mass, conventional systems incur severe hardware overheads: they either require out-of-place memory allocation spikes ($O(N)$ auxiliary buffers via operating system calls like \texttt{cudaMalloc}) or introduce high page-table indirection latencies via virtualized paged attention mechanisms. In this paper, we propose a novel hardware-software co-designed architecture and GPU execution kernel for \textbf{zero-copy in-place KV-cache compaction}. By formulating eviction as an algebraic mapping satisfying the idempotence condition ($f(f(x)) = f(x)$), our method stabilizes retained tokens into mathematical fixed points and partitions the permutation space into mutually disjoint permutation cycles. We prove that minimal-index cycle leaders can be deterministically verified on-the-fly with strictly $O(1)$ scalar auxiliary memory, completely eliminating marking bitmasks and temporary global buffers. We implement our algorithm as a high-performance Triton kernel and evaluate it on an NVIDIA Ada Lovelace GPU accelerator (RTX 500 Generation, \texttt{sm\_89}) with a sequence length of 8,192 tokens and 50\% context pruning. Empirical results demonstrate a \textbf{100\% elimination of peak auxiliary VRAM} (dropping from 384.00~MB to exactly 0.00~MB), zero numerical degradation, and guaranteed physical memory contiguity for downstream tensor cores.
 \end{abstract}
 
 \section{Introduction}
@@ -197,7 +197,7 @@ To achieve sub-7ms latency matching native out-of-place PyTorch copies, two key 
 
 \subsection{Experimental Setup}
 \begin{itemize}
-    \item \textbf{Hardware Platform:} NVIDIA Blackwell Generation GPU Accelerator (\texttt{sm\_120}).
+    \item \textbf{Hardware Platform:} NVIDIA Ada Lovelace GPU Architecture (RTX 500 Generation, \texttt{sm\_89}).
     \item \textbf{Tensor Configuration:} Batch size $B = 4$, attention heads $H = 32$, sequence length $N = 8,192$, head dimension $D = 128$, data type \texttt{float16}.
     \item \textbf{Eviction Policy:} 50\% pruning ratio (compacting $N = 8,192$ tokens down to $K = 4,096$ active tokens).
     \item \textbf{Baseline:} The de facto PyTorch out-of-place tensor reallocation and copy pattern utilized in current LLM frameworks.
@@ -205,7 +205,7 @@ To achieve sub-7ms latency matching native out-of-place PyTorch copies, two key 
 
 \begin{table*}[t]
 \centering
-\caption{Empirical Hardware Compaction Performance Comparison on NVIDIA Blackwell Architecture (\texttt{sm\_120})}
+\caption{Empirical Hardware Compaction Performance Comparison on NVIDIA Ada Lovelace Architecture (\texttt{sm\_89})}
 \label{tab:results}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}lllll@{}}
@@ -249,7 +249,7 @@ No \texttt{NaN} or \texttt{Inf} anomalies were generated, confirming that every 
 
 \section{Conclusion}
 \label{sec:conclusion}
-We have presented an in-place, zero-copy compaction architecture for dynamic KV-cache tensors in deep learning accelerators. By combining idempotent index projection with bitmask-free cycle leader identification, our method achieves deterministic memory compaction using strictly $O(1)$ auxiliary storage. Benchmark results on an enterprise NVIDIA Blackwell processor confirm a 100\% reduction in auxiliary memory overhead (saving 384~MB per invocation) while maintaining physical memory contiguity. This approach establishes a new foundation for high-throughput, memory-bounded LLM inference on modern parallel processors.
+We have presented an in-place, zero-copy compaction architecture for dynamic KV-cache tensors in deep learning accelerators. By combining idempotent index projection with bitmask-free cycle leader identification, our method achieves deterministic memory compaction using strictly $O(1)$ auxiliary storage. Benchmark results on an NVIDIA Ada Lovelace GPU accelerator confirm a 100\% reduction in auxiliary memory overhead (saving 384~MB per invocation) while maintaining physical memory contiguity. This approach establishes a new foundation for high-throughput, memory-bounded LLM inference on modern parallel processors.
 
 \section*{Acknowledgment}
 The author gratefully acknowledges the assistance of advanced agentic AI pair-programming tools (Google Antigravity / Gemini) for engineering support in C++20/CUDA kernel optimization, automated hardware benchmark harness scripting, and manuscript \LaTeX\ typesetting. The underlying mathematical theory of idempotent involution permutations ($f(f(x))=f(x)$, $\pi = \pi^{-1}$) and the foundational systems architectures originate from the author's prior theoretical work (A.~E. {\c{C}}etin, arXiv:1307.3877, arXiv:1301.2046). The author conceived the research design, verified all empirical results on physical hardware, and holds full responsibility for the scientific integrity, claims, and conclusions presented in this work.
