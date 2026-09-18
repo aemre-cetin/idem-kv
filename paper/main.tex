@@ -71,14 +71,7 @@ Under Eq.~(\ref{eq:idempotence}), all elements mapped to their final designated 
 \begin{equation}
     \mathcal{F} = \{x \mid f(x) = x\}
 \end{equation}
-As illustrated in Figure~\ref{fig:state}, elements within $\mathcal{F}$ represent stabilized attractor basins that do not undergo relocation in subsequent compaction epochs, ensuring single-pass convergence and preventing thrashing.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.92\textwidth]{figures/FIG_2_Memory_State_Transition.pdf}
-\caption{Memory State Transformation: State A (Fragmented before compaction), Associative Target Mapping with Disjoint Cycle Resolution, and State B (Contiguous Active Region after truncation).}
-\label{fig:state}
-\end{figure*}
+Elements within $\mathcal{F}$ represent stabilized attractor basins that do not undergo relocation in subsequent compaction epochs, ensuring single-pass convergence and preventing thrashing.
 
 \subsection{Disjoint Cycle Decomposition}
 Any permutation $\pi$ of the finite set $\{0, \dots, N-1\}$ admits a unique decomposition into a set of mutually disjoint cyclic orbits:
@@ -110,7 +103,8 @@ If during the forward traversal at outer loop index $i$, there exists any elemen
 Suppose index $i$ is encountered. If $i$ is not the minimal element of its cycle $\mathcal{C}$, there exists some $k \in \mathcal{C}$ such that $k < i$. Since the outer loop executes in strictly increasing order $0, 1, \dots, N-1$, index $k$ was visited prior to index $i$. At that earlier step, the full orbit $\mathcal{C}$ was already permuted. Thus, testing whether $\text{curr} < i$ determines visitation status using strictly $O(1)$ scalar storage, completely resolving the bitmask dilemma.
 \end{proof}
 
-\begin{algorithm}[t]
+\begin{algorithm}[t!]
+\small
 \caption{In-Place Cycle-Leader KV Compaction}
 \label{alg:compact}
 \begin{algorithmic}[1]
