@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.9.4)  18 SEP 2026 18:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.9.4)  18 SEP 2026 18:56
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -688,12 +688,7 @@ Underfull \hbox (badness 1237) in paragraph at lines 242--243
 et-i-cal foun-da-tions
  []
 
-
-Underfull \hbox (badness 2781) in paragraph at lines 249--250
-\OT1/lmr/m/n/10 (+20) Anti-grav-ity / Gem-ini) for en-gi-neer-ing sup-port in
- []
-
-[4] (main.bbl) [5] (main.aux)
+(main.bbl [4]) [5] (main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -708,7 +703,7 @@ Here is how much of TeX's memory you used:
  42087 multiletter control sequences out of 15000+600000
  702194 words of font info for 202 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,1728b,565s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,1728b,573s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx
 10.pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm
 /lmbx12.pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/publ
@@ -733,7 +728,7 @@ Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmsy9.pfb>
 .pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/l
 mtt12.pfb><C:/Users/emre.cetin/AppData/Local/Programs/MiKTeX/fonts/type1/public
 /amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (5 pages, 432832 bytes).
+Output written on main.pdf (5 pages, 432173 bytes).
 PDF statistics:
  301 PDF objects out of 1000 (max. 8388607)
  62 named destinations out of 1000 (max. 500000)
