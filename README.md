@@ -3,6 +3,7 @@
 **Zero-Copy In-Place KV-Cache Compactor for vLLM & Deep Learning Accelerators**
 
 [![USPTO Patent Pending](https://img.shields.io/badge/USPTO_Patent-64%2F148,668_Pending-blue.svg)](https://patents.google.com)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22834016.svg)](https://doi.org/10.5281/zenodo.22834016)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Academic Paper](https://img.shields.io/badge/Academic_Paper-PDF-red.svg)](paper/main.pdf)
 [![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-brightgreen.svg)]()
@@ -120,7 +121,8 @@ Bu kütüphanenin dayandığı teorik temeller, matematiksel ispatlar ($f(f(x)) 
 
 - **Makale Başlığı:** **Zero-Copy In-Place Compaction and Idempotent Associative Routing of Dynamic Key-Value Cache Tensors in Deep Learning Accelerators**
 - **Tam Metin PDF:** [📄 Read Academic Paper (PDF)](paper/main.pdf)
-- **Yayın & İndeks Durumu:** ResearchGate 414015222 / arXiv: 01_idempotent_kv_cache.tar.gz (7 Sayfa Tam Makale, Yayında)
+- **Zenodo DOI:** [10.5281/zenodo.22834016](https://doi.org/10.5281/zenodo.22834016) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22834016.svg)](https://doi.org/10.5281/zenodo.22834016)
+- **Yayın & İndeks Durumu:** Zenodo (DOI: 10.5281/zenodo.22834016) / ResearchGate 414015222 (5 Sayfa Tam Makale, Yayında)
 
 ---
 
